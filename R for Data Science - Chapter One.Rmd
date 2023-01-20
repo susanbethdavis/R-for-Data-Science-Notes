@@ -1,0 +1,172 @@
+---
+title: 'R for Data Science: Chapter One'
+author: "Susan Davis"
+date: "2023-01-18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(tidyverse)
+```
+
+Question: Do cars with big engines use more fuel then cars with small engines? displ correlates to the size of a cars engine. Hwy corresponds to the amount of fuel used on highways in miles per gallon. 
+```{r}
+head(mpg)
+?mpg
+```
+
+Due to the negative relationship between displ and hwy it can be interpreted that cars with large engines use more fuel. 
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy))
+```
+
+We notice there are a few points on the right hand side of the graph that fall outside of the linear trend. We hypothesize that these cars may be hybrids due to their fuel efficiency at higher engine sizes. We test this theory below. 
+```{r}
+ggplot(data=mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, color = class))
+```
+Our hypothesis is incorrect. Two seater cars are most likely not hybrid cars but rather sports cars. Sports cars have large engines but small bodies making them more fuel efficient. 
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y=hwy, size = class))
+```
+
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x=displ, y = hwy, alpha = class))
+
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, shape = class))
+```
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy), color = 'blue')
+```
+
+```{r}
+ggplot(data=mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_wrap (~class, nrow = 2)
+```
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y=hwy)) +
+  facet_grid(drv ~cyl)
+```
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy))
+
+ggplot(data = mpg) + 
+  geom_smooth(mapping = aes(x = displ, y = hwy))
+```
+```{r}
+ggplot(data = mpg) + 
+  geom_smooth(mapping = aes(x = displ, y = hwy, linetype = drv))
+
+```
+```{r}
+ggplot(data = mpg) + 
+  geom_smooth(mapping = aes(x = displ, y = hwy))
+
+ggplot(data = mpg) + 
+  geom_smooth(mapping = aes(x = displ, y = hwy, group = drv))
+
+ggplot(data = mpg) + 
+  geom_smooth(mapping = aes(x = displ, y = hwy, color = drv), show.legend = FALSE)
+```
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  geom_smooth(mapping = aes(x=displ, y = hwy))
+```
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+         geom_point() + 
+         geom_smooth()
+       
+```
+
+```{r}
+ggplot(data = mpg, mapping = aes(x=displ, y =hwy)) +
+  geom_point(mapping = aes(color = class)) + geom_smooth()
+```
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point(mapping = aes(color = class)) +
+  geom_smooth(data = filter(mpg, class == 'subcompact'), se = FALSE)
+```
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar( mapping = aes(x = cut))
+```
+
+```{r}
+ggplot(data = diamonds) + 
+  stat_count(mapping = aes(x = cut))
+```
+```{r}
+demo <- tribble(
+ ~a, ~b,
+ "bar_1", 20,
+ "bar_2", 30,
+ "bar_3", 40
+)
+ggplot(data = demo) +
+ geom_bar(
+ mapping = aes(x = a, y = b), stat = "identity"
+ )
+```
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes( x = cut, y = ..prop.., group = 1))
+```
+```{r}
+ggplot(data = diamonds) +
+ stat_summary(
+ mapping = aes(x = cut, y = depth),
+ fun.ymin = min,
+ fun.ymax = max,
+ fun.y = median
+ )
+```
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, color = cut))
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut, fill = cut))
+```
+```{r}
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes( x = cut, fill = clarity))
+```
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = cut, fill = clarity)) +
+  geom_bar(alpha = 1/5, position = "identity")
+
+ggplot(data = diamonds,mapping = aes(x = cut, color = clarity)
+       ) + geom_bar(fill = NA, position = "identity")
+```
+```{r}
+ggplot(data = diamonds) + geom_bar(mapping = aes(x = cut, fill = clarity),position = "fill")
+```
+```{r}
+ggplot(data = diamonds) +
+ geom_bar(
+ mapping = aes(x = cut, fill = clarity),
+ position = "dodge"
+ )
+```
+```{r}
+ggplot(data = mpg) +
+ geom_point(
+ mapping = aes(x = displ, y = hwy),
+ position = "jitter"
+ )
+```
+
