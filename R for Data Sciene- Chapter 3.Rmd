@@ -117,4 +117,157 @@ delays <- flights %>%
   filter(count > 20, dest != "HNL")
 head(delays)
 ```
+```{r}
+flights %>%
+ group_by(year, month, day) %>%
+ summarize(mean = mean(dep_delay))
+```
+
+```{r}
+flights %>%
+ group_by(year, month, day) %>%
+ summarize(mean = mean(dep_delay, na.rm = TRUE))
+```
+
+```{r}
+not_cancelled <- flights %>%
+ filter(!is.na(dep_delay), !is.na(arr_delay))
+
+not_cancelled %>%
+ group_by(year, month, day) %>%
+ summarize(mean = mean(dep_delay))
+```
+```{r}
+delays <- not_cancelled %>%
+ group_by(tailnum) %>%
+ summarize(
+ delay = mean(arr_delay)
+ )
+ggplot(data = delays, mapping = aes(x = delay)) +
+ geom_freqpoly(binwidth = 10)
+```
+
+```{r}
+delays <- not_cancelled %>%
+ group_by(tailnum) %>%
+ summarize(
+ delay = mean(arr_delay, na.rm = TRUE),
+ n = n()
+ )
+ggplot(data = delays, mapping = aes(x = n, y = delay)) +
+ geom_point(alpha = 1/10)
+```
+```{r}
+delays %>%
+ filter(n > 25) %>%
+ ggplot(mapping = aes(x = n, y = delay)) +
+ geom_point(alpha = 1/10)
+```
+```{r}
+# Convert to a tibble so it prints nicely
+library(Lahman)
+batting <- as_tibble(Lahman::Batting)
+batters <- batting %>%
+ group_by(playerID) %>%
+ summarize(
+ ba = sum(H, na.rm = TRUE) / sum(AB, na.rm = TRUE),
+ ab = sum(AB, na.rm = TRUE)
+ )
+batters %>%
+ filter(ab > 100) %>%
+ ggplot(mapping = aes(x = ab, y = ba)) +
+ geom_point() +
+ geom_smooth(se = FALSE)
+#> `geom_smooth()` using method = 'gam'
+```
+
+```{r}
+batters %>%
+ arrange(desc(ba))
+```
+```{r}
+not_cancelled %>%
+ group_by(year, month, day) %>%
+ summarize(
+ # average delay:
+ avg_delay1 = mean(arr_delay),
+ # average positive delay:
+ avg_delay2 = mean(arr_delay[arr_delay > 0])
+ )
+```
+
+```{r}
+not_cancelled %>%
+ group_by(dest) %>%
+ summarize(distance_sd = sd(distance)) %>%
+ arrange(desc(distance_sd))
+```
+```{r}
+# When do the first and last flights leave each day?
+not_cancelled %>%
+ group_by(year, month, day) %>%
+ summarize(
+ first = min(dep_time),
+ last = max(dep_time))
+```
+
+```{r}
+not_cancelled %>%
+ group_by(year, month, day) %>%
+ summarize(
+ first_dep = first(dep_time),
+ last_dep = last(dep_time))
+```
+
+```{r}
+not_cancelled %>%
+ group_by(year, month, day) %>%
+ mutate(r = min_rank(desc(dep_time))) %>%
+ filter(r %in% range(r))
+```
+```{r}
+not_cancelled%>%
+  group_by(dest)%>%
+  summarize(carriers = n_distinct(carrier))%>%
+  arrange(desc(carriers))
+```
+
+```{r}
+not_cancelled %>%
+ count(tailnum, wt = distance)
+```
+```{r}
+# How many flights left before 5am? (these usually
+# indicate delayed flights from the previous day)
+not_cancelled %>%
+ group_by(year, month, day) %>%
+ summarize(n_early = sum(dep_time < 500))
+```
+
+```{r}
+# What proportion of flights are delayed by more
+# than an hour?
+not_cancelled %>%
+ group_by(year, month, day) %>%
+ summarize(hour_perc = mean(arr_delay > 60))
+```
+
+```{r}
+daily <- group_by(flights, year, month, day)
+(per_day <- summarize(daily, flights = n()))
+```
+
+```{r}
+(per_month <- summarize(per_day, flights = sum(flights)))
+```
+
+```{r}
+(per_year <- summarize(per_month, flights = sum(flights)))
+```
+
+```{r}
+daily %>%
+ ungroup() %>% # no longer grouped by date
+ summarize(flights = n()) # all flights
+```
 
